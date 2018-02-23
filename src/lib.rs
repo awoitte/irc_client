@@ -1,9 +1,3 @@
-#[cfg(test)]
-mod tests{
-    use super::*;
+pub mod chat_stream;
+pub mod irc_connection;
 
-    #[test]
-    fn it_works(){
-        assert!(true);
-    }
-}
