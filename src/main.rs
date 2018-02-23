@@ -23,7 +23,7 @@ fn main() {
     //send_raw("JOIN #newbies", &stream);
     //send_raw("CAP END", &stream);
 
-   irc.read(|&dat| {
+   irc.read(|ref client, &dat| {
         let text = String::from_utf8_lossy(&dat);
         println!("{}", text);
         Ok(())

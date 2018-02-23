@@ -14,16 +14,19 @@ impl<'a, T:ChatStream> IRC<'a, T>{
         }
     }
 
-    pub fn read<F>(&mut self, respond: F)
-        where F: Fn(&[u8; 512])-> Result<()> {
+    pub fn read<F>(&mut self, respond: F) //TODO: Async
+        where F: Fn(&IRC<'a, T>, &[u8; 512])-> Result<()> {
 
-        let do_loop = true;
+        let mut do_loop = true;
         while do_loop {
             let mut dat = [0; 512];
             match self.stream.read(&mut dat){
                 Ok(n) => {
                     if n > 0 {
-                        respond(&dat);
+                        match respond(self, &dat){
+                            Err(_)=>do_loop = false ,
+                            _ => ()
+                        }
                     }
                 },
                 Err(error) => println!("error: {}", error) 
