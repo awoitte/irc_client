@@ -42,7 +42,7 @@ func Test_it_should_read_until_Err_return(t *testing.T) {
 	var irc = Connect("test", stream)
 	calls := 0
 
-	irc.Read(func(message string) error {
+	irc.ReadLoop(func(message string) error {
 		calls++
 		if calls > 1 {
 			return fmt.Errorf("done reading")

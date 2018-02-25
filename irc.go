@@ -4,8 +4,6 @@ import (
 	"bytes"
 )
 
-//"net"
-
 type IRC struct {
 	connection Chat_stream
 }
@@ -25,9 +23,9 @@ func (irc IRC) SendRaw(message string) {
 	irc.connection.Write(message + "\r\n")
 }
 
-func (irc IRC) Read(respond func(string) error) error {
+func (irc IRC) ReadLoop(respond func(string) error) error {
 	buf := &bytes.Buffer{}
-	data := make([]byte, 512)
+	data := make([]byte, 256)
 	n := 0
 	var err error
 	for {
