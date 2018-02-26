@@ -49,6 +49,19 @@ func Test_it_should_send_join_message_on_join(t *testing.T) {
 	expect_write(t, stream.writes, "JOIN #test\r\n")
 }
 
+func Test_it_should_return_error_if_already_joined(t *testing.T) {
+	stream := &MockStream{}
+	irc := Connect("test", stream)
+	err := irc.JoinChannel("chan")
+	if err != nil {
+		t.Fail()
+	}
+	err = irc.JoinChannel("chan")
+	if err == nil {
+		t.Fail()
+	}
+}
+
 func Test_it_should_add_channel_and_privmsg(t *testing.T) {
 	stream := MockStream{}
 	irc := Connect("test", &stream)

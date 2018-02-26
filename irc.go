@@ -26,9 +26,13 @@ func (irc *IRC) SendRaw(message string) {
 	irc.connection.Write(message + "\r\n")
 }
 
-func (irc *IRC) JoinChannel(channel string) {
+func (irc *IRC) JoinChannel(channel string) error {
+	if irc.channel != "" {
+		return errors.New("You are already in a channel")
+	}
 	irc.channel = channel
 	irc.SendRaw("JOIN #" + channel)
+	return nil
 }
 
 func (irc *IRC) PartChannel() error {
