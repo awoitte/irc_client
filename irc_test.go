@@ -5,44 +5,38 @@ import (
 	"testing"
 )
 
-type MockStream struct {
-	lastWrite string
-}
+func Test_it_should_send_nick_and_user_on_connect(t *testing.T) {
+	stream := MockStream{}
+	listener := stream.StartListening()
+	go Connect("test", &stream)
+	expect_write(t, listener, "NICK test\r\n")
+	expect_write(t, listener, "USER test * 0 :test test\r\n")
 
-func (mock *MockStream) Read(b []byte) (int, error) {
-	return 1, nil
-}
-
-func (mock *MockStream) Write(message string) {
-	mock.lastWrite = message
 }
 
 func Test_it_should_add_channel_and_privmsg(t *testing.T) {
-	var stream = MockStream{}
-	var irc = Connect("test", &stream)
-	irc.SendMessage("chan", "test")
-	expected := "PRIVMSG chan test\r\n"
-	if stream.lastWrite != expected {
-		t.Errorf("expected: %v, recieved %v", expected, stream.lastWrite)
-	}
+	stream := MockStream{}
+	irc := Connect("test", &stream)
+
+	stream.StartListening()
+	go irc.SendMessage("chan", "test")
+	expect_write(t, stream.writes, "PRIVMSG chan test\r\n")
 }
 
 func Test_it_should_attach_line_breaks(t *testing.T) {
-	var stream = MockStream{}
-	var irc = Connect("test", &stream)
-	irc.SendRaw("test")
-	expected := "test\r\n"
-	if stream.lastWrite != expected {
-		t.Errorf("expected: %v, recieved %v", expected, stream.lastWrite)
-	}
+	stream := MockStream{}
+	irc := Connect("test", &stream)
+	stream.StartListening()
+	go irc.SendRaw("test")
+	expect_write(t, stream.writes, "test\r\n")
 }
 
 func Test_it_should_read_until_Err_return(t *testing.T) {
-	var stream = &MockStream{}
-	var irc = Connect("test", stream)
+	stream := &MockStream{}
+	irc := Connect("test", stream)
 	calls := 0
 
-	irc.ReadLoop(func(message string) error {
+	irc.ReadLoop(1, func(message string) error {
 		calls++
 		if calls > 1 {
 			return fmt.Errorf("done reading")
