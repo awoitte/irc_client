@@ -23,9 +23,9 @@ func (irc IRC) SendRaw(message string) {
 	irc.connection.Write(message + "\r\n")
 }
 
-func (irc IRC) ReadLoop(respond func(string) error) error {
+func (irc IRC) ReadLoop(chunk_size int, respond func(string) error) error {
 	buf := &bytes.Buffer{}
-	data := make([]byte, 256)
+	data := make([]byte, chunk_size)
 	n := 0
 	var err error
 	for {
