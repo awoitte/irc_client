@@ -1,9 +1,5 @@
 package irc
 
-import (
-	"bytes"
-)
-
 type IRC struct {
 	connection Chat_stream
 }
@@ -24,23 +20,15 @@ func (irc IRC) SendRaw(message string) {
 }
 
 func (irc IRC) ReadLoop(chunk_size int, respond func(string) error) error {
-	buf := &bytes.Buffer{}
-	data := make([]byte, chunk_size)
-	n := 0
-	var err error
 	for {
-		n, err = irc.connection.Read(data)
+		data, err := irc.connection.Read()
+		if err != nil {
+			return err
+		}
+		err = respond(data)
 		if err != nil {
 			break
 		}
-		buf.Write(data[:n])
-		if n > 0 {
-			err = respond(string(buf.Bytes()))
-			if err != nil {
-				break
-			}
-			buf = &bytes.Buffer{}
-		}
 	}
-	return err
+	return nil
 }

@@ -1,12 +1,13 @@
 package irc
 
 import (
-	"fmt"
+	"bufio"
 	"net"
 )
 
 type TCPConnection struct {
-	connection net.Conn
+	read_connection  *bufio.Reader
+	write_connection *bufio.Writer
 }
 
 func TCPConnect(url, port string) (*TCPConnection, error) {
@@ -14,12 +15,17 @@ func TCPConnect(url, port string) (*TCPConnection, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &TCPConnection{conn}, nil
+
+	return &TCPConnection{
+		bufio.NewReader(conn),
+		bufio.NewWriter(conn)}, nil
 }
 
 func (tcp TCPConnection) Write(message string) {
-	fmt.Fprintf(tcp.connection, message)
+	tcp.write_connection.WriteString(message)
+	tcp.write_connection.Flush()
 }
-func (tcp TCPConnection) Read(b []byte) (int, error) {
-	return tcp.connection.Read(b)
+
+func (tcp TCPConnection) Read() (string, error) {
+	return tcp.read_connection.ReadString('\n')
 }

@@ -9,8 +9,8 @@ type MockStream struct {
 	writes chan string
 }
 
-func (mock *MockStream) Read(b []byte) (int, error) {
-	return 1, nil
+func (mock *MockStream) Read() (string, error) {
+	return "", nil
 }
 
 func (mock *MockStream) Write(message string) {

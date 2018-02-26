@@ -1,6 +1,6 @@
 package irc
 
 type Chat_stream interface {
-	Read([]byte) (int, error)
+	Read() (string, error)
 	Write(string)
 }
